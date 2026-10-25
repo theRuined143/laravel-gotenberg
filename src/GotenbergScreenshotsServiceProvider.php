@@ -3,6 +3,7 @@
 namespace Nonamechrs\GotenbergScreenshots;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Nonamechrs\GotenbergScreenshots\Http\Middleware\EnsureValidApiToken;
 
@@ -17,9 +18,13 @@ class GotenbergScreenshotsServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Templates resolve as screenshots::templates.<name>; files in
-        // resources/views/vendor/screenshots/templates of the host app take precedence.
+        // Templates resolve as screenshots::<name>. Lookup order: the app's configured
+        // template paths, then resources/views/vendor/screenshots, then the package's own.
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'screenshots');
+
+        foreach (array_reverse((array) config('screenshots.templates.paths')) as $path) {
+            View::prependNamespace('screenshots', $path);
+        }
 
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__.'/../config/screenshots.php' => config_path('screenshots.php')], 'screenshots-config');

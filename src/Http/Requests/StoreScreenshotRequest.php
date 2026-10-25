@@ -12,13 +12,12 @@ class StoreScreenshotRequest extends FormRequest
     public const FORMATS = ['png', 'jpeg', 'webp'];
 
     /**
-     * Template names are the Blade files in the package's (or the app's published) templates folder;
-     * callers can never send raw Blade.
+     * Template names are the Blade files in the screenshots view namespace (the app's configured
+     * template paths plus the package's own); callers can never send raw Blade.
      */
     public static function templates(): array
     {
         return collect(View::getFinder()->getHints()['screenshots'] ?? [])
-            ->map(fn ($path) => $path.'/templates')
             ->filter(fn ($dir) => is_dir($dir))
             ->flatMap(fn ($dir) => File::files($dir))
             ->map(fn ($f) => str($f->getFilename())->before('.blade.php')->toString())

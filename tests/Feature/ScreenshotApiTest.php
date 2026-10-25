@@ -37,7 +37,7 @@ class ScreenshotApiTest extends TestCase
     {
         Http::fake(['gotenberg:3000/*' => Http::response('PNGBYTES', 200)]);
 
-        $id = $this->create(['template' => 'card', 'data' => ['title' => '<b>Hi</b>']])
+        $id = $this->create(['template' => 'custom', 'data' => ['name' => '<b>Hi</b>']])
             ->assertCreated()
             ->json('id');
 
@@ -48,6 +48,28 @@ class ScreenshotApiTest extends TestCase
         $this->withToken('secret')->get("/gotenberg/screenshots/{$id}")
             ->assertOk()
             ->assertHeader('Content-Type', 'image/png');
+    }
+
+    public function test_app_templates_override_bundled_ones(): void
+    {
+        Http::fake(['gotenberg:3000/*' => Http::response('PNGBYTES', 200)]);
+
+        $this->create(['template' => 'card'])->assertCreated();
+
+        Http::assertSent(fn (Request $r) => str_contains($r->body(), 'overridden card'));
+    }
+
+    public function test_bundled_template_is_used_when_the_app_has_none(): void
+    {
+        $this->templatePaths = [];
+        $this->refreshApplication();
+        config(['screenshots.api_token' => 'secret']);
+        Storage::fake('local');
+        Http::fake(['gotenberg:3000/*' => Http::response('PNGBYTES', 200)]);
+
+        $this->create(['template' => 'card', 'data' => ['title' => 'Hello']])->assertCreated();
+
+        Http::assertSent(fn (Request $r) => str_contains($r->body(), '<h1>Hello</h1>'));
     }
 
     public function test_returns_502_when_gotenberg_fails(): void

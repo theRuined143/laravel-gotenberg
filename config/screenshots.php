@@ -12,6 +12,12 @@ return [
     'disk' => env('SCREENSHOT_DISK', 'local'),
     'directory' => 'screenshots',
 
+    // Directories of your own Blade templates (e.g. resources/views/screenshots/invoice.blade.php
+    // is requested as "invoice"). They take precedence over the bundled templates.
+    'templates' => [
+        'paths' => [resource_path('views/screenshots')],
+    ],
+
     // The bundled HTTP API. Set 'enabled' to false to use only the GotenbergClient in your own code.
     'routes' => [
         'enabled' => true,

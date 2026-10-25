@@ -18,7 +18,7 @@ class ScreenshotController extends Controller
         $input = $request->validated();
         $format = $input['format'] ?? 'png';
 
-        $html = view('screenshots::templates.'.$input['template'], ['data' => $input['data'] ?? []])->render();
+        $html = view('screenshots::'.$input['template'], ['data' => $input['data'] ?? []])->render();
 
         try {
             $image = $gotenberg->screenshotHtml($html, $format, $input['width'] ?? 1200, $input['height'] ?? 630);

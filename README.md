@@ -40,9 +40,11 @@ replaces the package's token middleware entirely. Leave it `null` to keep the de
 
 ## Templates
 
-Templates are Blade files in the `screenshots::templates` namespace and receive `$data`. The package ships `card`.
-To add or override one, publish the views and edit `resources/views/vendor/screenshots/templates/<name>.blade.php`.
-Only files in that folder can be requested, so callers can never send raw Blade.
+Put your own Blade files in `resources/views/screenshots/`. Each receives `$data`, and `invoice.blade.php` is requested as `"template": "invoice"`.
+They take precedence over the bundled templates (the package ships `card`), so a file named `card.blade.php` overrides it.
+Use more or different folders via `templates.paths` in `config/screenshots.php`.
+You can also publish the bundled ones with `--tag=screenshots-views` and edit `resources/views/vendor/screenshots`.
+Only files in those folders can be requested, so callers can never send raw Blade.
 The page is sent to Gotenberg as a standalone `index.html`: use inline CSS and data URIs or absolute URLs for assets.
 
 ## Without the API
