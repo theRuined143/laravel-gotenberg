@@ -1,0 +1,64 @@
+<?php
+
+namespace Nonamechrs\GotenbergScreenshots\Tests\Feature;
+
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Nonamechrs\GotenbergScreenshots\Tests\TestCase;
+
+class ScreenshotApiTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['screenshots.api_token' => 'secret', 'screenshots.gotenberg.url' => 'http://gotenberg:3000']);
+        Storage::fake('local');
+    }
+
+    private function create(array $payload)
+    {
+        return $this->withToken('secret')->postJson('/api/screenshots', $payload);
+    }
+
+    public function test_requires_a_valid_token(): void
+    {
+        $this->postJson('/api/screenshots', [])->assertUnauthorized();
+        $this->withToken('wrong')->postJson('/api/screenshots', [])->assertUnauthorized();
+    }
+
+    public function test_rejects_unknown_templates(): void
+    {
+        $this->create(['template' => '../../secrets'])->assertUnprocessable()->assertJsonValidationErrors('template');
+    }
+
+    public function test_creates_and_fetches_a_screenshot(): void
+    {
+        Http::fake(['gotenberg:3000/*' => Http::response('PNGBYTES', 200)]);
+
+        $id = $this->create(['template' => 'card', 'data' => ['title' => '<b>Hi</b>']])
+            ->assertCreated()
+            ->json('id');
+
+        Http::assertSent(fn (Request $r) => $r->url() === 'http://gotenberg:3000/forms/chromium/screenshot/html'
+            && str_contains($r->body(), '&lt;b&gt;Hi&lt;/b&gt;'));
+        Storage::disk('local')->assertExists("screenshots/{$id}.png");
+
+        $this->withToken('secret')->get("/api/screenshots/{$id}")
+            ->assertOk()
+            ->assertHeader('Content-Type', 'image/png');
+    }
+
+    public function test_returns_502_when_gotenberg_fails(): void
+    {
+        Http::fake(['gotenberg:3000/*' => Http::response('boom', 500)]);
+
+        $this->create(['template' => 'card'])->assertStatus(502);
+    }
+
+    public function test_unknown_screenshot_is_404(): void
+    {
+        $this->withToken('secret')->getJson('/api/screenshots/01JZZZZZZZZZZZZZZZZZZZZZZZ')->assertNotFound();
+    }
+}

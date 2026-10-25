@@ -1,0 +1,38 @@
+{
+    "name": "nonamechrs/laravel-gotenberg-screenshots",
+    "description": "Render Blade templates to images through a Gotenberg server, with an optional token-protected HTTP API.",
+    "keywords": ["laravel", "gotenberg", "screenshot", "og-image"],
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/http": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "phpunit/phpunit": "^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nonamechrs\\GotenbergScreenshots\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nonamechrs\\GotenbergScreenshots\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nonamechrs\\GotenbergScreenshots\\GotenbergScreenshotsServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
