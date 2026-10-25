@@ -26,16 +26,17 @@ php artisan vendor:publish --tag=screenshots-views    # resources/views/vendor/s
 ## HTTP API
 
 ```
-POST /api/screenshots        {"template":"card","data":{"title":"Hi"},"width":1200,"height":630,"format":"png"}
-                             -> 201 {"id","format","url"}
-GET  /api/screenshots/{id}   -> the image
+POST /gotenberg/screenshots        {"template":"card","data":{"title":"Hi"},"width":1200,"height":630,"format":"png"}
+                                   -> 201 {"id","format","url"}
+GET  /gotenberg/screenshots/{id}   -> the image
 ```
 
-Both need `Authorization: Bearer <API_TOKEN>`. An empty `API_TOKEN` rejects every request.
+By default both need `Authorization: Bearer <API_TOKEN>`. An empty `API_TOKEN` rejects every request.
 `format` is png, jpeg or webp; `width`/`height` are 100–4000. Gotenberg failures return `502`.
 
-Change the prefix or middleware (e.g. use Sanctum instead of the token), or turn the routes off, in `config/screenshots.php`
-under `routes`.
+Change the prefix, or turn the routes off, in `config/screenshots.php` under `routes`. To use your app's own auth
+(Sanctum, your own token middleware, ...) set `routes.middleware` to an array such as `['api', 'auth:sanctum']`; it
+replaces the package's token middleware entirely. Leave it `null` to keep the default.
 
 ## Templates
 

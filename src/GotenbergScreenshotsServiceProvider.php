@@ -4,6 +4,7 @@ namespace Nonamechrs\GotenbergScreenshots;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Nonamechrs\GotenbergScreenshots\Http\Middleware\EnsureValidApiToken;
 
 class GotenbergScreenshotsServiceProvider extends ServiceProvider
 {
@@ -28,7 +29,9 @@ class GotenbergScreenshotsServiceProvider extends ServiceProvider
         }
 
         if (config('screenshots.routes.enabled')) {
-            Route::middleware(config('screenshots.routes.middleware'))
+            $middleware = config('screenshots.routes.middleware') ?? ['api', EnsureValidApiToken::class];
+
+            Route::middleware($middleware)
                 ->prefix(config('screenshots.routes.prefix'))
                 ->group(__DIR__.'/../routes/api.php');
         }

@@ -19,13 +19,13 @@ class ScreenshotApiTest extends TestCase
 
     private function create(array $payload)
     {
-        return $this->withToken('secret')->postJson('/api/screenshots', $payload);
+        return $this->withToken('secret')->postJson('/gotenberg/screenshots', $payload);
     }
 
     public function test_requires_a_valid_token(): void
     {
-        $this->postJson('/api/screenshots', [])->assertUnauthorized();
-        $this->withToken('wrong')->postJson('/api/screenshots', [])->assertUnauthorized();
+        $this->postJson('/gotenberg/screenshots', [])->assertUnauthorized();
+        $this->withToken('wrong')->postJson('/gotenberg/screenshots', [])->assertUnauthorized();
     }
 
     public function test_rejects_unknown_templates(): void
@@ -45,7 +45,7 @@ class ScreenshotApiTest extends TestCase
             && str_contains($r->body(), '&lt;b&gt;Hi&lt;/b&gt;'));
         Storage::disk('local')->assertExists("screenshots/{$id}.png");
 
-        $this->withToken('secret')->get("/api/screenshots/{$id}")
+        $this->withToken('secret')->get("/gotenberg/screenshots/{$id}")
             ->assertOk()
             ->assertHeader('Content-Type', 'image/png');
     }
@@ -59,6 +59,6 @@ class ScreenshotApiTest extends TestCase
 
     public function test_unknown_screenshot_is_404(): void
     {
-        $this->withToken('secret')->getJson('/api/screenshots/01JZZZZZZZZZZZZZZZZZZZZZZZ')->assertNotFound();
+        $this->withToken('secret')->getJson('/gotenberg/screenshots/01JZZZZZZZZZZZZZZZZZZZZZZZ')->assertNotFound();
     }
 }

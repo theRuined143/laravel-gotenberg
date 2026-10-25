@@ -15,7 +15,9 @@ return [
     // The bundled HTTP API. Set 'enabled' to false to use only the GotenbergClient in your own code.
     'routes' => [
         'enabled' => true,
-        'prefix' => 'api/screenshots',
-        'middleware' => ['api', Nonamechrs\GotenbergScreenshots\Http\Middleware\EnsureValidApiToken::class],
+        'prefix' => 'gotenberg/screenshots',
+        // null uses the package's ['api', EnsureValidApiToken]. Set an array (e.g. ['api', 'auth:sanctum'])
+        // to replace it entirely with your app's own middleware, including its auth.
+        'middleware' => null,
     ],
 ];
